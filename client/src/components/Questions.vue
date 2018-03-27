@@ -18,10 +18,10 @@
 		</div>
 	</div>
 
-  <span>3 Answers</span>  
+  <span>{{countAnswer(answers)}} Answers</span>  
   <hr>
   <div>
-  <div class="row" v-for="answer in answers" :key="answer._id" v-if="question._id == $route.params.id">
+  <div class="row" v-for="answer in answers" :key="answer._id" v-if="answer.questionId === $route.params.id">
 		<div class="col col-sm-2 left-content">
 			<ul>
 				<li><span class="fa fa-caret-up fa-3x"></span></li>
@@ -33,10 +33,15 @@
 			<div class="title"></div>
 			<div class="content">
 				<p>
-					We are running jobmanager and task manager on the same machine and during the run in some scenario's we notice that jobmanager hold more memory than it should hold according to configuration from Top:...
+          {{answer.content}}
 				</p>
+        <p>
+          <span class="answered">answered by: {{answer.userId.name}}, </span>
+          <span class="date">{{getDate(answer.userId.createdAt)}}</span>
+        </p>
 			</div>
 		</div>
+    <div class="col col-sm-12"><hr></div>
 	</div>
 	</div>
   <form>
@@ -44,12 +49,13 @@
     <label for="email">Your Answer:</label>
     <textarea class="form-control" v-model="objanswer.content"></textarea>
   </div>
-  <button type="submit" class="btn btn-primary" @click="postAnswer(answers)">Post Your Answer</button>
+  <button type="submit" class="btn btn-primary" @click="postAnswer(objanswer)">Post Your Answer</button>
 </form>
   </div>
 </template>
 
 <script>
+import moment from 'moment'
 export default {
   data () {
     return {
@@ -60,6 +66,10 @@ export default {
       },
       votes: 0
     }
+  },
+  created () {
+    this.$store.dispatch('readQuestions')
+    this.$store.dispatch('readAnswers')
   },
   computed: {
     questions () {
@@ -72,12 +82,25 @@ export default {
   methods: {
     postAnswer (answer) {
       this.$store.dispatch('postAnswer', answer)
+      this.objanswer.content = ''
     },
     upVoteQuestion (question) {
       this.$store.dispatch('upVoteQuestion', question)
     },
     downVoteQuestion (question) {
       this.$store.dispatch('downVoteQuestion', question)
+    },
+    getDate (date) {
+      return moment(date).startOf('day').fromNow()
+    },
+    countAnswer (answers) {
+      let counter = 0
+      answers.map(answer => {
+        if (answer.questionId === this.$route.params.id) {
+          counter++
+        }
+      })
+      return counter
     }
   }
 
@@ -85,6 +108,20 @@ export default {
 </script>
 
 <style scoped>
+  .title {
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	  color: royalblue;
+	  font-size: 14pt;
+    margin-bottom: 10px;
+  }
+  .answered {
+    font-size: 12px;
+    color:darkcyan;
+  }
+  .date {
+    font-size: 11px;
+    color:gray
+  }
   .question {
     padding-top: 90px;
   }

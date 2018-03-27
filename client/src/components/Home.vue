@@ -12,14 +12,14 @@
 		<div class="col col-sm-2 left-content">
 			<ul>
 				<li>
-					<div>
+					<div class="total-vote text-center">
 					<span>0</span><br>
-					<span>votes</span>
+					<span>Votes</span>
 					</div>
 				</li>
 				<li>
-					<div>
-					<span>0</span><br>
+					<div class="total-answer text-center">
+					<span>{{countAnswer(questions)}}</span><br>
 					<span>Answers</span>
 					</div>
 				</li>
@@ -29,46 +29,44 @@
 			<div class="title"><router-link :to="'/question/'+question._id">{{question.title}}</router-link></div>
 			<div class="content">
 				<p>
-					{{question.content.substring(0,150)}}
+					{{question.content.substring(0,300)}}...
 				</p>
-			</div>
-		</div>
-	</div>
-	<hr>
-	<div class="row">
-		<div class="col col-sm-2 left-content">
-			<ul>
-				<li>
-					<div>
-					<span>0</span><br>
-					<span>votes</span>
-					</div>
-				</li>
-				<li><span></span></li>
-			</ul>
-		</div>
-		<div class="col col-sm-10">
-			<div class="title">Flink:jobmanager hold more memory than configure</div>
-			<div class="content">
 				<p>
-					We are running jobmanager and task manager on the same machine and during the run in some scenario's we notice that jobmanager hold more memory than it should hold according to configuration from Top:...
-				</p>
+          <span class="answered">asked by: {{question.userId.name}},</span>
+          <span class="date">{{getDate(question.userId.createdAt)}}</span>
+        </p>
 			</div>
 		</div>
+		<div class="col col-sm-12"><hr></div>
 	</div>
-	<hr>
 </div>
 </template>
 
 <script>
+import moment from 'moment'
 export default {
   computed: {
     questions () {
       return this.$store.getters.getQuestions
     }
   },
-  beforeCreate () {
+  created () {
     this.$store.dispatch('readQuestions')
+    this.$store.dispatch('readAnswers')
+  },
+  methods: {
+    countAnswer (answers) {
+      let counter = 0
+      answers.map(answer => {
+        if (answer.questionId) {
+          counter++
+        }
+      })
+      return counter
+    },
+    getDate (date) {
+      return moment(date).startOf('day').fromNow()
+    }
   }
 }
 </script>
@@ -78,10 +76,10 @@ export default {
 	margin-top: 20px;
 	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 	color: royalblue;
-	font-size: 12pt;
+	font-size: 14pt;
 }
 .content {
-	font-size: 12px;
+	font-size: 13px;
 }
 ul {
 	list-style: none;
@@ -92,4 +90,23 @@ ul {
 .left-content {
 	margin-top: 20px;
 }
+.total-answer {
+  background-color:lavender;
+	font-size: 14px;
+	margin: 0px 15px 0px 15px;
+}
+.total-vote {
+  background-color:honeydew;
+	font-size: 14px;
+	margin: 0px 15px 5px 15px;
+}
+.answered {
+    font-size: 12px;
+    color:darkcyan;
+  }
+.date {
+	font-size: 11px;
+	color:gray
+}
+
 </style>

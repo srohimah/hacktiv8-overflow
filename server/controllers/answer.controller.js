@@ -2,6 +2,14 @@ const Answer = require('../models/answer.model')
 const jwt = require('jsonwebtoken')
 
 module.exports ={
+  showAllAnswer: function (req, res){
+    Answer.find().sort([['updatedAt', 'descending']]).populate('userId').exec().then(data=>{
+      res.status(200).json({
+        message: 'list question',
+        data
+      })
+    }).catch(err=>res.send(err))
+  },
   addAnswer: function (req, res){
     let token = req.headers.token
     var decoded = jwt.verify(token, 'secret');

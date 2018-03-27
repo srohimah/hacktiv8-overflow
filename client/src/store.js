@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import swal from 'sweetalert'
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export const store = new Vuex.Store({
       return state.questions
     },
     getAnswers (state) {
+      console.log('getter', state)
       return state.answers
     }
 
@@ -43,7 +45,11 @@ export const store = new Vuex.Store({
 
     },
     postAnswer (state, payload) {
+      console.log('mutation', payload)
       state.answers.push(payload)
+    },
+    readAnswers (state, payload) {
+      state.answers = payload
     }
   },
   actions: {
@@ -70,19 +76,29 @@ export const store = new Vuex.Store({
       })
     },
     postAnswer ({commit}, payload) {
-      axios({
-        method: 'post',
-        url: 'http://localhost:3000/answers',
-        data: {
-          content: payload.content,
-          questionId: payload.questionId
-        },
-        headers: {
-          token: localStorage.tokenUser
-        }
-      }).then(answer => {
-        console.log('jaihhh', answer)
-        commit('postAnswer', answer)
+      if (!localStorage.tokenUser) {
+        swal('Tidak memiliki akses!', 'harap login terlebih dahulu!', 'warning')
+      } else {
+        axios({
+          method: 'post',
+          url: 'http://localhost:3000/answers',
+          data: {
+            content: payload.content,
+            questionId: payload.questionId
+          },
+          headers: {
+            token: localStorage.tokenUser
+          }
+        }).then(answer => {
+          // console.log('action---', answer)
+          commit('postAnswer', answer.data.data)
+        })
+      }
+    },
+    readAnswers ({commit}, payload) {
+      axios.get('http://localhost:3000/answers').then(response => {
+        // console.log('response', response)
+        commit('readAnswers', response.data.data)
       })
     },
     upVoteQuestion ({commit}, payload) {
