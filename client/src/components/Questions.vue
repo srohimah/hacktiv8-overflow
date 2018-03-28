@@ -36,7 +36,7 @@
           {{answer.content}}
 				</p>
         <p>
-          <span class="answered">answered by: {{answer.userId.name}}, </span>
+          <span class="answered">answered by: {{answer.userId.name}},</span>
           <span class="date">{{getDate(answer.userId.createdAt)}}</span>
         </p>
 			</div>

@@ -15,7 +15,6 @@ export const store = new Vuex.Store({
       return state.questions
     },
     getAnswers (state) {
-      console.log('getter', state)
       return state.answers
     }
 
@@ -97,7 +96,6 @@ export const store = new Vuex.Store({
     },
     readAnswers ({commit}, payload) {
       axios.get('http://localhost:3000/answers').then(response => {
-        // console.log('response', response)
         commit('readAnswers', response.data.data)
       })
     },
